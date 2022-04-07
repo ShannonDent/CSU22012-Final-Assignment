@@ -1,8 +1,14 @@
+import java.io.*;
 import java.util.Scanner;
+import java.util.HashMap;
 
 public class Front_Interface {
 
     public static void main(String[] args) {
+
+        HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
+        readFile("stops.txt", stopsMap);
+
         System.out.println("╔════════════════════════════════════════════════════════════════════╗ \n" +
                 "║                 WELCOME TO THE BUS MANAGEMENT SYSTEM               ║ \n" +
                 "╠════════════════════════════════════════════════════════════════════╣ \n" +
@@ -58,6 +64,79 @@ public class Front_Interface {
         input.close();
     }
 
+    public static void readFile(String filename, HashMap stopsMap){
+        try {
+            File input = new File(filename);
+            Scanner scanFile = new Scanner(input);
+            String line = scanFile.nextLine();
+            int counter = 0;
+            while (scanFile.hasNextLine()) {
+                try {
+                    String[] split = line.split(",");
+                    if (counter == 0){
+                        counter++;
+                        line = scanFile.nextLine();
+                    } else {
+                        int stop_id;
+                        if (!split[0].equalsIgnoreCase(" ")){
+                            stop_id = Integer.parseInt(split[0]);
+                        } else {
+                            stop_id = 0;
+                        }
+
+                        int stop_code;
+                        if (!split[1].equalsIgnoreCase(" ")){
+                            stop_code = Integer.parseInt(split[1]);
+                        } else {
+                            stop_code = 0;
+                        }
+
+                        String stop_name = split[2];
+                        String stop_desc = split[3];
+
+                        double stop_lat;
+                        if (!split[4].equalsIgnoreCase(" ")){
+                            stop_lat = Double.parseDouble(split[4]);
+                        } else {
+                            stop_lat = 0;
+                        }
+
+                        double stop_lon;
+                        if (!split[5].equalsIgnoreCase(" ")){
+                            stop_lon = Double.parseDouble(split[5]);
+                        } else {
+                            stop_lon = 0;
+                        }
+
+                        String zone_id = split[6];
+                        String stop_url = split[7];
+                        String location_type = split[8];
+
+                        int parent_station;
+                        if (split.length == 10){
+                            if(!split[9].equalsIgnoreCase(" ")){
+                                parent_station = Integer.parseInt(split[9]);
+                            } else {
+                                parent_station = 0;
+                            }
+                        } else {
+                            parent_station = 0;
+                        }
+                        Stop currentStop = new Stop(stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, zone_id, stop_url, location_type, parent_station);
+                        stopsMap.put(currentStop.stop_id, currentStop);
+                        line = scanFile.nextLine();
+                    }
+                } catch (Exception e) {
+                    System.out.println("An error has been detected: " + e);
+                    e.printStackTrace();
+                }
+            }
+        } catch(FileNotFoundException e) {
+            System.out.println("An error has been detected: " + e);
+            e.printStackTrace();
+        }
+    }
+
     public static void shortestRoute(Scanner userInput) {
         boolean quit = false;
         while (!quit) {
@@ -95,6 +174,7 @@ public class Front_Interface {
             if (userInput.hasNext() && !userInput.hasNextInt()) {  //Change to hashmap searching later.
                 String busStopName = userInput.next();
                 System.out.println("Your bus stop is..." + busStopName);
+
                 return;
             } else if (userInput.next().equalsIgnoreCase("quit")) {
                 quit = true;

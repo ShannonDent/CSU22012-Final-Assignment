@@ -1,4 +1,4 @@
-public class Stops {
+public class Stop {
     int stop_id;
     int stop_code;
     String stop_name;
@@ -10,7 +10,7 @@ public class Stops {
     String location_type;
     int parent_station;
 
-    public Stops(int stop_id, int stop_code, String stop_name, String stop_desc, double stop_lat, double stop_lon, String zone_id, String stop_url, String location_type, int parent_station) {
+    public Stop(int stop_id, int stop_code, String stop_name, String stop_desc, double stop_lat, double stop_lon, String zone_id, String stop_url, String location_type, int parent_station) {
         this.stop_id = stop_id;
         this.stop_code = stop_code;
         this.stop_name = stop_name;
