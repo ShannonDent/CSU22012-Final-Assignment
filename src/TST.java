@@ -62,13 +62,13 @@ public class TST {
         }
     }
 
-    public boolean search(String word){
+    public String search(String word){
         return search(rootNode, word.toCharArray(), 0);
     }
 
-    private boolean search(Node rootNode, char[] word, int pointer) {
+    private String search(Node rootNode, char[] word, int pointer) {
         if (rootNode == null) {
-            return false;
+            return "";
         }
         if (word[pointer] < rootNode.nodeCharacter) {
             return search(rootNode.left, word, pointer);
@@ -76,9 +76,15 @@ public class TST {
             return search(rootNode.right, word, pointer);
         } else {
             if (rootNode.endOfWord && pointer == word.length - 1){
-                return true;
+                return String.valueOf(word);
             } else if (pointer == word.length - 1) {
-                return false;
+                char nextCharacter = rootNode.middle.nodeCharacter;
+                char[] restOfWord = new char[word.length + 1];
+                for (int i = 0; i < word.length; i++) {
+                    restOfWord[i] = word[i];
+                }
+                restOfWord[restOfWord.length - 1] = nextCharacter;
+                return search(rootNode.middle, restOfWord, pointer + 1);
             } else {
                 return search(rootNode.middle, word, pointer + 1);
             }

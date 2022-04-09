@@ -11,21 +11,21 @@ public class Front_Interface {
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
         readFile("stops.txt", stopsMap);
 
-        System.out.println("╔════════════════════════════════════════════════════════════════════╗ \n" +
-                "║                 WELCOME TO THE BUS MANAGEMENT SYSTEM               ║ \n" +
-                "╠════════════════════════════════════════════════════════════════════╣ \n" +
-                "║     (Enter one of the following options onto the command line)     ║ \n" +
-                "╠════════════════════════════════════════════════════════════════════╣ \n" +
-                "║ 1. Find Shortest Route Between Two Bus Stops                       ║ \n" +
-                "╠════════════════════════════════════════════════════════════════════╣ \n" +
-                "║ 2. Search For A Bus Stop                                           ║ \n" +
-                "╠════════════════════════════════════════════════════════════════════╣ \n" +
-                "║ 3. Search For Trips With An Arrival Time                           ║ \n" +
-                "╚════════════════════════════════════════════════════════════════════╝");
         Scanner input = new Scanner(System.in);
         boolean quit = false;
 
         while (!quit) {
+            System.out.println("╔════════════════════════════════════════════════════════════════════╗ \n" +
+                    "║                 WELCOME TO THE BUS MANAGEMENT SYSTEM               ║ \n" +
+                    "╠════════════════════════════════════════════════════════════════════╣ \n" +
+                    "║     (Enter one of the following options onto the command line)     ║ \n" +
+                    "╠════════════════════════════════════════════════════════════════════╣ \n" +
+                    "║ 1. Find Shortest Route Between Two Bus Stops                       ║ \n" +
+                    "╠════════════════════════════════════════════════════════════════════╣ \n" +
+                    "║ 2. Search For A Bus Stop                                           ║ \n" +
+                    "╠════════════════════════════════════════════════════════════════════╣ \n" +
+                    "║ 3. Search For Trips With An Arrival Time                           ║ \n" +
+                    "╚════════════════════════════════════════════════════════════════════╝");
             System.out.print("\nEnter option between 1-3 or type quit: ");
             if (input.hasNextInt()) {
                 int usersChoice = input.nextInt();
@@ -170,38 +170,61 @@ public class Front_Interface {
 
     public static void busStopSearch(Scanner userInput, HashMap<Integer, Stop> stopsMap) {
         TST searchTree = new TST();
+        HashMap<String, Integer>  stopNameToIDMap = new HashMap<String, Integer>();
         for (Map.Entry<Integer, Stop> entry : stopsMap.entrySet()) {
             Integer stopID = entry.getKey();
             Stop stop = entry.getValue();
-            String [] stopNames = (stop.stop_name).split(" ", 2);
-            if (stopNames[0].length() == 2 || stopNames[0] == "FLAGSTOP") {
-                String keyword = stopNames[0];
-                String fullName = stopNames[1];
-                stopNames[0] = fullName;
-                stopNames[1] = keyword;
-                searchTree.insert(stopNames[0]);
-            } else {
-                String fullName = stopNames[0] + " " + stopNames[1];
+            String [] stopNameArr = (stop.stop_name).split(" ", 2);
+            if (stopNameArr[0].length() == 2 || stopNameArr[0] == "FLAGSTOP") {
+                String keyword = stopNameArr[0];
+                String startOfName = stopNameArr[1];
+                stopNameArr[0] = startOfName;
+                stopNameArr[1] = keyword;
+                String fullName = stopNameArr[0] + " " + stopNameArr[1];
                 searchTree.insert(fullName);
+                stopNameToIDMap.put(fullName, stopID);
+            } else {
+                String fullName = stopNameArr[0] + " " + stopNameArr[1];
+                searchTree.insert(fullName);
+                stopNameToIDMap.put(fullName, stopID);
             }
 
         }
         boolean quit = false;
+        userInput.nextLine();
         while (!quit) {
             System.out.print("Enter bus stop name (or quit): ");
             //TST
-            if (userInput.hasNext() && !userInput.hasNextInt()) {
-                if (searchTree.search(userInput.next()) == true) {
-                    String busStopName = userInput.next();
-                    System.out.println("Your bus stop is..." + busStopName);
+            if (userInput.hasNextLine()) {
+                String myInput = userInput.nextLine();
+                if (myInput.equalsIgnoreCase("quit")) {
+                    quit = true;
                 } else {
-                    System.out.println("STOP NOT FOUND");
+                    String isFound = searchTree.search(myInput);
+                    Stop result = stopsMap.get(stopNameToIDMap.get(isFound));
+                    System.out.println("+----------------------------------------------------+ \n" +
+                            "                     STOP" +"  "+ result.stop_id +"                     "+" \n" +
+                            "+----------------------------------------------------+ \n" +
+                            " Stop Code:          |  " + result.stop_code +"             "+" \n" +
+                            "+----------------------------------------------------+ \n" +
+                            " Stop Name:          |  " + result.stop_name +"             "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Stop Description:  |  " + result.stop_desc +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Stop Latitude:     |  " + result.stop_lat +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Stop Longitude:    |  " + result.stop_lon +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Stop URL:          |  " + result.stop_url +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Zone ID:           |  " + result.zone_id +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Location Type:     |  " + result.location_type +"            "+" \n" +
+                            "+--------------------+-------------------------------+ \n" +
+                            "| Parent Type:       |  " + result.parent_station +"            "+" \n" +
+                            "+--------------------+-------------------------------+");
                 }
-                System.out.println("I'm HERE");
 
-                return;
-            } else if (userInput.next().equalsIgnoreCase("quit")) {
-                quit = true;
             } else {
                 System.out.println("Error - Enter a valid bus ID.");
             }
