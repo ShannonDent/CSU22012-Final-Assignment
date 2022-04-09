@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.HashMap;
 
@@ -8,8 +10,6 @@ public class Front_Interface {
 
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
         readFile("stops.txt", stopsMap);
-
-
 
         System.out.println("╔════════════════════════════════════════════════════════════════════╗ \n" +
                 "║                 WELCOME TO THE BUS MANAGEMENT SYSTEM               ║ \n" +
@@ -168,14 +168,36 @@ public class Front_Interface {
         return;
     }
 
-    public static void busStopSearch(Scanner userInput, HashMap stopsMap) {
+    public static void busStopSearch(Scanner userInput, HashMap<Integer, Stop> stopsMap) {
+        TST searchTree = new TST();
+        for (Map.Entry<Integer, Stop> entry : stopsMap.entrySet()) {
+            Integer stopID = entry.getKey();
+            Stop stop = entry.getValue();
+            String [] stopNames = (stop.stop_name).split(" ", 2);
+            if (stopNames[0].length() == 2 || stopNames[0] == "FLAGSTOP") {
+                String keyword = stopNames[0];
+                String fullName = stopNames[1];
+                stopNames[0] = fullName;
+                stopNames[1] = keyword;
+                searchTree.insert(stopNames[0]);
+            } else {
+                String fullName = stopNames[0] + " " + stopNames[1];
+                searchTree.insert(fullName);
+            }
+
+        }
         boolean quit = false;
         while (!quit) {
             System.out.print("Enter bus stop name (or quit): ");
             //TST
-            if (userInput.hasNext() && !userInput.hasNextInt()) {  //Change to hashmap searching later.
-                String busStopName = userInput.next();
-                System.out.println("Your bus stop is..." + busStopName);
+            if (userInput.hasNext() && !userInput.hasNextInt()) {
+                if (searchTree.search(userInput.next()) == true) {
+                    String busStopName = userInput.next();
+                    System.out.println("Your bus stop is..." + busStopName);
+                } else {
+                    System.out.println("STOP NOT FOUND");
+                }
+                System.out.println("I'm HERE");
 
                 return;
             } else if (userInput.next().equalsIgnoreCase("quit")) {
