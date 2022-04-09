@@ -9,6 +9,8 @@ public class Front_Interface {
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
         readFile("stops.txt", stopsMap);
 
+
+
         System.out.println("╔════════════════════════════════════════════════════════════════════╗ \n" +
                 "║                 WELCOME TO THE BUS MANAGEMENT SYSTEM               ║ \n" +
                 "╠════════════════════════════════════════════════════════════════════╣ \n" +
@@ -32,13 +34,13 @@ public class Front_Interface {
                         System.out.println("╔══════════════════════════════════════════════════╗ \n" +
                                 "║     FIND A SHORTEST ROUTE BETWEEN TWO STOPS      ║ \n" +
                                 "╚══════════════════════════════════════════════════╝ ");
-                        shortestRoute(input);
+                        shortestRoute(input, stopsMap);
                         break;
                     case 2:
                         System.out.println("╔══════════════════════════════════════════════════╗ \n" +
                                 "║               SEARCH FOR A BUS STOP              ║ \n" +
                                 "╚══════════════════════════════════════════════════╝ ");
-                        busStopSearch(input);
+                        busStopSearch(input, stopsMap);
                         break;
                     case 3:
                         System.out.println("╔══════════════════════════════════════════════════╗ \n" +
@@ -137,7 +139,7 @@ public class Front_Interface {
         }
     }
 
-    public static void shortestRoute(Scanner userInput) {
+    public static void shortestRoute(Scanner userInput, HashMap stopsMap) {
         boolean quit = false;
         while (!quit) {
             System.out.print("Enter first bus stop ID (or quit): ");
@@ -166,7 +168,7 @@ public class Front_Interface {
         return;
     }
 
-    public static void busStopSearch(Scanner userInput) {
+    public static void busStopSearch(Scanner userInput, HashMap stopsMap) {
         boolean quit = false;
         while (!quit) {
             System.out.print("Enter bus stop name (or quit): ");
