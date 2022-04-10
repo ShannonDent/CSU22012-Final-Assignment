@@ -1,8 +1,5 @@
 import java.io.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.HashMap;
+import java.util.*;
 
 public class Front_Interface {
 
@@ -175,19 +172,15 @@ public class Front_Interface {
             Integer stopID = entry.getKey();
             Stop stop = entry.getValue();
             String [] stopNameArr = (stop.stop_name).split(" ", 2);
-            if (stopNameArr[0].length() == 2 || stopNameArr[0] == "FLAGSTOP") {
+            if (stopNameArr[0].equalsIgnoreCase("WB") || stopNameArr[0].equalsIgnoreCase("NB") || stopNameArr[0].equalsIgnoreCase("SB") || stopNameArr[0].equalsIgnoreCase("EB")|| stopNameArr[0].equalsIgnoreCase("FLAGSTOP")) {
                 String keyword = stopNameArr[0];
                 String startOfName = stopNameArr[1];
                 stopNameArr[0] = startOfName;
                 stopNameArr[1] = keyword;
-                String fullName = stopNameArr[0] + " " + stopNameArr[1];
-                searchTree.insert(fullName);
-                stopNameToIDMap.put(fullName, stopID);
-            } else {
-                String fullName = stopNameArr[0] + " " + stopNameArr[1];
-                searchTree.insert(fullName);
-                stopNameToIDMap.put(fullName, stopID);
             }
+            String fullName = stopNameArr[0] + " " + stopNameArr[1];
+            searchTree.insert(fullName);
+            stopNameToIDMap.put(fullName, stopID);
 
         }
         boolean quit = false;
@@ -200,29 +193,33 @@ public class Front_Interface {
                 if (myInput.equalsIgnoreCase("quit")) {
                     quit = true;
                 } else {
-                    String isFound = searchTree.search(myInput);
-                    Stop result = stopsMap.get(stopNameToIDMap.get(isFound));
-                    System.out.println("+----------------------------------------------------+ \n" +
-                            "                     STOP" +"  "+ result.stop_id +"                     "+" \n" +
-                            "+----------------------------------------------------+ \n" +
-                            " Stop Code:          |  " + result.stop_code +"             "+" \n" +
-                            "+----------------------------------------------------+ \n" +
-                            " Stop Name:          |  " + result.stop_name +"             "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Stop Description:  |  " + result.stop_desc +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Stop Latitude:     |  " + result.stop_lat +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Stop Longitude:    |  " + result.stop_lon +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Stop URL:          |  " + result.stop_url +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Zone ID:           |  " + result.zone_id +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Location Type:     |  " + result.location_type +"            "+" \n" +
-                            "+--------------------+-------------------------------+ \n" +
-                            "| Parent Type:       |  " + result.parent_station +"            "+" \n" +
-                            "+--------------------+-------------------------------+");
+                    String isFound = searchTree.search(myInput.toUpperCase());
+                    if (isFound == null) {
+                        System.out.println(myInput + " is an invalid input. Enter a valid bus stop name.");
+                    } else {
+                        Stop result = stopsMap.get(stopNameToIDMap.get(isFound));
+                        System.out.println("+----------------------------------------------------+ \n" +
+                                "                     STOP" + "  " + result.stop_id + "                     " + " \n" +
+                                "+----------------------------------------------------+ \n" +
+                                " Stop Code:          |  " + result.stop_code + "             " + " \n" +
+                                "+----------------------------------------------------+ \n" +
+                                " Stop Name:          |  " + result.stop_name + "             " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Stop Description:  |  " + result.stop_desc + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Stop Latitude:     |  " + result.stop_lat + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Stop Longitude:    |  " + result.stop_lon + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Stop URL:          |  " + result.stop_url + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Zone ID:           |  " + result.zone_id + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Location Type:     |  " + result.location_type + "            " + " \n" +
+                                "+--------------------+-------------------------------+ \n" +
+                                "| Parent Type:       |  " + result.parent_station + "            " + " \n" +
+                                "+--------------------+-------------------------------+");
+                    }
                 }
 
             } else {

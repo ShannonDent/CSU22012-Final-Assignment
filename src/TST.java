@@ -68,7 +68,7 @@ public class TST {
 
     private String search(Node rootNode, char[] word, int pointer) {
         if (rootNode == null) {
-            return "";
+            return null;
         }
         if (word[pointer] < rootNode.nodeCharacter) {
             return search(rootNode.left, word, pointer);
