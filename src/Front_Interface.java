@@ -6,7 +6,9 @@ public class Front_Interface {
     public static void main(String[] args) {
 
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
-        readFile("stops.txt", stopsMap);
+        readFileStops("stops.txt", stopsMap);
+
+
 
         Scanner input = new Scanner(System.in);
         boolean quit = false;
@@ -63,7 +65,7 @@ public class Front_Interface {
         input.close();
     }
 
-    public static void readFile(String filename, HashMap stopsMap){
+    public static void readFileStops(String filename, HashMap stopsMap){
         try {
             File input = new File(filename);
             Scanner scanFile = new Scanner(input);
@@ -123,6 +125,101 @@ public class Front_Interface {
                         }
                         Stop currentStop = new Stop(stop_id, stop_code, stop_name, stop_desc, stop_lat, stop_lon, zone_id, stop_url, location_type, parent_station);
                         stopsMap.put(currentStop.stop_id, currentStop);
+                        line = scanFile.nextLine();
+                    }
+                } catch (Exception e) {
+                    System.out.println("An error has been detected: " + e);
+                    e.printStackTrace();
+                }
+            }
+        } catch(FileNotFoundException e) {
+            System.out.println("An error has been detected: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    public static void readFileStopTimes(String filename, HashMap<String, ArrayList<Trip>> arrivalTimeToTripMap){
+        try {
+            File input = new File(filename);
+            Scanner scanFile = new Scanner(input);
+            String line = scanFile.nextLine();
+            int counter = 0;
+            while (scanFile.hasNextLine()) {
+                try {
+                    String[] split = line.split(",");
+                    if (counter == 0){
+                        counter++;
+                        line = scanFile.nextLine();
+                    } else {
+                        int trip_id;
+                        if (!split[0].equalsIgnoreCase("")){
+                            trip_id = Integer.parseInt(split[0]);
+                        } else {
+                            trip_id = 0;
+                        }
+
+                        String arrival_time = split[1].replaceAll(" ", "0");
+                        String[] splitArrivalTime = split[1].split(":");
+                        if (Integer.parseInt(splitArrivalTime[0].replaceAll(" ", "")) > 23 || Integer.parseInt(splitArrivalTime[1]) > 59 || Integer.parseInt(splitArrivalTime[2]) > 59 ) {
+                            arrival_time = null;
+                        }
+                        String departure_time = split[2].replaceAll(" ", "0");
+                        String[] splitDepartureTime = split[1].split(":");
+                        if (Integer.parseInt(splitDepartureTime[0].replaceAll(" ", "")) > 23 || Integer.parseInt(splitDepartureTime[1]) > 59 || Integer.parseInt(splitDepartureTime[2]) > 59 ) {
+                            departure_time = null;
+                        }
+
+                        int stop_id;
+                        if (!split[3].equalsIgnoreCase("")){
+                            stop_id = Integer.parseInt(split[3]);
+                        } else {
+                            stop_id = 0;
+                        }
+
+                        int stop_sequence;
+                        if (!split[4].equalsIgnoreCase("")){
+                            stop_sequence = Integer.parseInt(split[4]);
+                        } else {
+                            stop_sequence = 0;
+                        }
+
+                        int stop_headsign;
+                        if (!split[5].equalsIgnoreCase("")){
+                            stop_headsign = Integer.parseInt(split[5]);
+                        } else {
+                            stop_headsign = 0;
+                        }
+
+                        int pickup_type;
+                        if (!split[6].equalsIgnoreCase("")){
+                            pickup_type = Integer.parseInt(split[6]);
+                        } else {
+                            pickup_type = 0;
+                        }
+
+                        int drop_off_type;
+                        if (!split[7].equalsIgnoreCase("")){
+                            drop_off_type = Integer.parseInt(split[7]);
+                        } else {
+                            drop_off_type = 0;
+                        }
+
+                        double shape_dist_traveled;
+                        if (!split[7].equalsIgnoreCase("")){
+                            shape_dist_traveled = Double.parseDouble(split[7]);
+                        } else {
+                            shape_dist_traveled = 0;
+                        }
+
+                        Trip currentTrip = new Trip(trip_id, arrival_time,  departure_time, stop_id, stop_sequence, stop_headsign, pickup_type, drop_off_type, shape_dist_traveled);
+                        if(arrivalTimeToTripMap.containsKey(arrival_time)){
+                            ArrayList<Trip> currentTripArrayList = arrivalTimeToTripMap.get(arrival_time);
+                            currentTripArrayList.add(currentTrip);
+                        } else {
+                            ArrayList<Trip> newTripArrList= new ArrayList<Trip>();
+                            newTripArrList.add(currentTrip);
+                            arrivalTimeToTripMap.put(arrival_time, newTripArrList);
+                        }
                         line = scanFile.nextLine();
                     }
                 } catch (Exception e) {
@@ -230,17 +327,46 @@ public class Front_Interface {
     }
 
     public static void arrivalTimeSearch(Scanner userInput) {
+        HashMap<String, ArrayList<Trip>> arrivalTimeToTripMap = new HashMap<>();
+        System.out.println("Loading...");
+        readFileStopTimes("stop_times.txt", arrivalTimeToTripMap);
+        System.out.println("Loaded!");
+
         boolean quit = false;
         while (!quit) {
-            System.out.print("Enter desired arrival time: ");
-            if (userInput.hasNext() && !userInput.hasNextInt()){ // Use hashmap here to check
-                String arrivalTime = userInput.next();
-                System.out.println("Your arrival time..." + arrivalTime);
-                return;
-            } else if (userInput.next().equalsIgnoreCase("quit")) {
+            System.out.print("Enter desired arrival time in the format (hh:mm:ss): ");
+            String desiredArrivalTime = userInput.next();
+            if (desiredArrivalTime.contains(":")) {
+                if (!arrivalTimeToTripMap.containsKey(desiredArrivalTime)) {
+                    System.out.println("No trip found with desired arrival time");
+                } else {
+                    ArrayList<Trip> tripWithArrivalTime = arrivalTimeToTripMap.get(desiredArrivalTime);
+                    for (int i = 0; i < tripWithArrivalTime.size(); i++) {
+                        System.out.println("+-----------------------------------------------+ \n" +
+                                "                  TRIP" + "  " + tripWithArrivalTime.get(i).trip_id + "                     " + " \n" +
+                                "+-----------------------------------------------+ \n" +
+                                " Arrival Time:        |  " + tripWithArrivalTime.get(i).arrival_time + "             " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                " Departure Time:      |  " + tripWithArrivalTime.get(i).departure_time + "             " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Stop ID:            |  " + tripWithArrivalTime.get(i).stop_id + "            " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Stop Sequence:      |  " + tripWithArrivalTime.get(i).stop_sequence + "            " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Stop Headsign:      |  " + tripWithArrivalTime.get(i).stop_headsign + "            " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Pick Up Type:       |  " + tripWithArrivalTime.get(i).pickup_type + "            " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Drop Off Type:      |  " + tripWithArrivalTime.get(i).drop_off_type + "            " + " \n" +
+                                "+---------------------+-------------------------+ \n" +
+                                "| Distance Traveled:  |  " + tripWithArrivalTime.get(i).shape_dist_traveled + "            " + " \n" +
+                                "+---------------------+-------------------------+");
+                    }
+                }
+            } else if (desiredArrivalTime.equalsIgnoreCase("quit")){
                 quit = true;
             } else {
-                System.out.println("Error - Enter a valid bus ID.");
+                System.out.println("Error - Enter a valid arrival time in the format (hh:mm:ss).");
             }
         }
         return;
