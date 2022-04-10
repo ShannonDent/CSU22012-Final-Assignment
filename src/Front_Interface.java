@@ -8,8 +8,6 @@ public class Front_Interface {
         HashMap<Integer, Stop> stopsMap = new HashMap<Integer, Stop>();
         readFileStops("stops.txt", stopsMap);
 
-
-
         Scanner input = new Scanner(System.in);
         boolean quit = false;
 
@@ -236,7 +234,8 @@ public class Front_Interface {
     public static void shortestRoute(Scanner userInput, HashMap stopsMap) {
         boolean quit = false;
         while (!quit) {
-            System.out.print("Enter first bus stop ID (or quit): ");
+            System.out.print("This functionality is currently under construction please type quit: ");
+            //System.out.print("Enter first bus stop ID (or quit): ");
             if (userInput.hasNextInt()) {
                 int firstID = userInput.nextInt();
                 System.out.print("Enter second bus stop ID (or quit):");
@@ -338,7 +337,7 @@ public class Front_Interface {
             String desiredArrivalTime = userInput.next();
             if (desiredArrivalTime.contains(":")) {
                 if (!arrivalTimeToTripMap.containsKey(desiredArrivalTime)) {
-                    System.out.println("No trip found with desired arrival time");
+                    System.out.println("Error - Enter a valid arrival time within the 24 hour clock.");
                 } else {
                     ArrayList<Trip> tripWithArrivalTime = arrivalTimeToTripMap.get(desiredArrivalTime);
                     for (int i = 0; i < tripWithArrivalTime.size(); i++) {
